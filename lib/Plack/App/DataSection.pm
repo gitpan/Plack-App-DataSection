@@ -1,7 +1,7 @@
 package Plack::App::DataSection;
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use parent qw/Plack::Component/;
 use MIME::Base64;
@@ -51,7 +51,12 @@ sub data_section {
 sub get_data_section {
     my ($self, $path) = @_;
     $self->{_data_section_hash} ||= $self->data_section->get_data_section;
-    $self->{_data_section_hash}{$path};
+    if ($path) {
+        $self->{_data_section_hash}{$path};
+    }
+    else {
+        $self->{_data_section_hash};
+    }
 }
 
 sub _cache { shift->{_cache} ||= {} }
@@ -94,6 +99,34 @@ sub last_modified {
         my @stat = stat $full_path;
         HTTP::Date::time2str( $stat[9] )
     };
+}
+
+sub dump_dir {
+    my ($self, $dir) = @_;
+    require Errno;
+    require Path::Class;
+
+    my %data_section = %{ $self->get_data_section };
+    my $base_dir = Path::Class::Dir->new($dir);
+
+    $base_dir->mkpath or $! != Errno::EEXIST() or die "failed to create dir:$base_dir:$!";
+
+    for my $key (keys %data_section) {
+        my ($content) = $self->get_content($key);
+
+        $key =~ s!^/!!g;
+        my ($sub_dir, $file) = $key =~ m!^(.*?)([^/]+)$!;
+
+        my $dir_path = $base_dir;
+        if ($sub_dir) {
+            $dir_path = $dir_path->subdir($sub_dir);
+            $dir_path->mkpath or $! != Errno::EEXIST() or die "failed to create dir:$dir_path:$!";
+        }
+
+        $file = $dir_path->file($file);
+        my $fh = $file->openw;
+        $fh->print($content);
+    }
 }
 
 1;

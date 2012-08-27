@@ -27,4 +27,4 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: git://github.com/Songmu/p5-Plack-App-DataSection.git
-version: 0.01
+version: 0.02
