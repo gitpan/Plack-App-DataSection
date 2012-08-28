@@ -1,7 +1,7 @@
 package Plack::App::DataSection;
 use strict;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use parent qw/Plack::Component/;
 use MIME::Base64;
@@ -21,7 +21,7 @@ sub call {
     }
     $path =~ s!^/!!;
 
-    my ($data, $content_type) = $self->get_content($path);
+    my ($data, $content_type) = $path ? $self->get_content($path) : ();
 
     return $self->return_404 unless $data;
 
@@ -69,7 +69,7 @@ sub get_content {
 
     unless ($is_binary) {
         my $encoding = $self->encoding || 'utf-8';
-        $mime_type .= "; charset=$encoding;";
+        $mime_type .= "; charset=$encoding";
     }
 
     my $content = $self->_cache->{$path} ||= do {
