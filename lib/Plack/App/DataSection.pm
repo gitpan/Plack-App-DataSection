@@ -1,7 +1,7 @@
 package Plack::App::DataSection;
 use strict;
 use warnings;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use parent qw/Plack::Component/;
 use MIME::Base64;
@@ -164,7 +164,7 @@ Plack::App::DataSection - psgi application for serving contents in data section
 
 Plack::App::DataSection is psgi application for serving contents in data section.
 
-Inherit this module and you can easly create psgi application for serving contents in data section.
+Inherit this module and you can easily create psgi application for serving contents in data section.
 
 You can even serve binary contents!
 
